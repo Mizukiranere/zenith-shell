@@ -1,0 +1,53 @@
+{
+  "themes": [
+    {
+      "name": "cyberpunk",
+      "description": "Electric cyan, hot pink magenta, and neon yellow inspired by Night City",
+      "accent": "#00f0ff",
+      "secondary": "#ff007f",
+      "git": "#bd00ff"
+    },
+    {
+      "name": "tokyonight",
+      "description": "Clean, calm Tokyo nighttime aesthetics with lavender and pastel blues",
+      "accent": "#7aa2f7",
+      "secondary": "#bb9af7",
+      "git": "#ff9e64"
+    },
+    {
+      "name": "catppuccin",
+      "description": "Soothing pastel palette with mocha lavender, flamingo, and sapphire",
+      "accent": "#cba6f7",
+      "secondary": "#f38ba8",
+      "git": "#fab387"
+    },
+    {
+      "name": "nord",
+      "description": "Arctic, north-bluish clean palette focused on readability",
+      "accent": "#88c0d0",
+      "secondary": "#81a1c1",
+      "git": "#ebcb8b"
+    },
+    {
+      "name": "matrix",
+      "description": "Classic hacker green phosphor terminal aesthetics",
+      "accent": "#00ff00",
+      "secondary": "#00aa00",
+      "git": "#55ff55"
+    },
+    {
+      "name": "dracula",
+      "description": "Iconic dark theme with purple, pink, and vibrant accents",
+      "accent": "#bd93f9",
+      "secondary": "#ff79c6",
+      "git": "#f1fa8c"
+    },
+    {
+      "name": "minimal",
+      "description": "Distraction-free monochrome palette for minimalists",
+      "accent": "#ffffff",
+      "secondary": "#888888",
+      "git": "#cccccc"
+    }
+  ]
+}
