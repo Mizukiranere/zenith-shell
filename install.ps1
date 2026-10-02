@@ -3,6 +3,8 @@
 # https://github.com/Mizukiranere/zenith-shell
 # ==============================================================================
 
+try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
+
 Write-Host @"
   ______           _ _   _        _____ _          _ _ 
  |___  /          (_) | | |      / ____| |        | | |
@@ -12,7 +14,7 @@ Write-Host @"
  /_____\___|_| |_||_|\__|_| |_| |_____/|_| |_|\___|_|_|
 "@ -ForegroundColor Cyan
 
-Write-Host "  Universal Terminal Theme & Prompt Engine for PowerShell`n" -ForegroundColor Magenta
+Write-Host "  Universal Terminal Theme, HUD Prompt & System Specs for PowerShell`n" -ForegroundColor Magenta
 
 $ZenithHome = "$HOME\.zenith"
 $RepoUrl = "https://github.com/Mizukiranere/zenith-shell.git"
@@ -54,7 +56,14 @@ if (Test-Path "$ZenithHome\core\zenith.ps1") {
 }
 
 Write-Host "`n✅ Zenith Shell successfully installed for PowerShell!" -ForegroundColor Green
-Write-Host "👉 Try commands:"
+
+# Display hardware specs immediately
+if (Get-Command Show-ZenithFetch -ErrorAction SilentlyContinue) {
+    Show-ZenithFetch
+}
+
+Write-Host "👉 Commands:"
+Write-Host "   zenith fetch          (show full device & hardware specs)" -ForegroundColor Cyan
 Write-Host "   zenith list           (view available themes)" -ForegroundColor Cyan
 Write-Host "   zenith set tokyonight (change theme)" -ForegroundColor Cyan
 Write-Host "   zenith preview        (preview all theme colors)`n" -ForegroundColor Cyan

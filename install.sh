@@ -20,7 +20,7 @@ print_banner() {
  /_____\___|_| |_||_|\__|_| |_| |_____/|_| |_|\___|_|_|
 EOF
   printf "\033[0m\n"
-  printf "  \033[1;35mUniversal Terminal Theme & Prompt Engine\033[0m\n"
+  printf "  \033[1;35mUniversal Terminal Theme, HUD Prompt & System Fetch Engine\033[0m\n"
   printf "  \033[0;37mLinux • VPS • Termux • macOS • WSL\033[0m\n\n"
 }
 
@@ -38,8 +38,8 @@ else
   git clone --depth 1 "$REPO_URL" "$ZENITH_HOME" --quiet
 fi
 
-# Ensure bin is executable
-chmod +x "$ZENITH_HOME/bin/zenith" "$ZENITH_HOME/core/zenith.sh"
+# Ensure bin & core scripts are executable
+chmod +x "$ZENITH_HOME/bin/zenith" "$ZENITH_HOME/core/zenith.sh" "$ZENITH_HOME/core/fetch.sh"
 
 # Install binary to PATH
 BIN_DIR="$HOME/.local/bin"
@@ -52,13 +52,11 @@ ln -sf "$ZENITH_HOME/bin/zenith" "$BIN_DIR/zenith"
 
 # Hook into Shell configurations
 SOURCE_CMD="[ -f \"$ZENITH_HOME/core/zenith.sh\" ] && source \"$ZENITH_HOME/core/zenith.sh\""
-HOOK_COUNT=0
 
 if [ -f "$HOME/.bashrc" ] || [ -n "$BASH_VERSION" ]; then
   touch "$HOME/.bashrc"
   if ! grep -q "zenith.sh" "$HOME/.bashrc" 2>/dev/null; then
     printf "\n# Zenith Shell Prompt\n%s\n" "$SOURCE_CMD" >> "$HOME/.bashrc"
-    HOOK_COUNT=$((HOOK_COUNT + 1))
   fi
 fi
 
@@ -66,7 +64,6 @@ if [ -f "$HOME/.zshrc" ] || [ -n "$ZSH_VERSION" ]; then
   touch "$HOME/.zshrc"
   if ! grep -q "zenith.sh" "$HOME/.zshrc" 2>/dev/null; then
     printf "\n# Zenith Shell Prompt\n%s\n" "$SOURCE_CMD" >> "$HOME/.zshrc"
-    HOOK_COUNT=$((HOOK_COUNT + 1))
   fi
 fi
 
@@ -76,8 +73,15 @@ if [ ! -f "$ZENITH_HOME/current_theme" ]; then
 fi
 
 printf "\n\033[1;32m✅ Zenith Shell successfully installed!\033[0m\n\n"
-printf "👉 To activate right now, run:\n"
+
+# Run initial fetch
+if [ -f "$ZENITH_HOME/core/fetch.sh" ]; then
+  bash "$ZENITH_HOME/core/fetch.sh"
+fi
+
+printf "👉 To activate prompt in current session:\n"
 printf "   \033[1;33msource ~/.zenith/core/zenith.sh\033[0m\n\n"
-printf "👉 To change themes anytime:\n"
-printf "   \033[1;36mzenith list\033[0m            (view themes)\n"
-printf "   \033[1;36mzenith set tokyonight\033[0m  (switch theme)\n\n"
+printf "👉 Useful Commands:\n"
+printf "   \033[1;36mzenith fetch\033[0m          (show full device & hardware specs)\n"
+printf "   \033[1;36mzenith list\033[0m           (view available themes)\n"
+printf "   \033[1;36mzenith set tokyonight\033[0m (switch theme)\n\n"

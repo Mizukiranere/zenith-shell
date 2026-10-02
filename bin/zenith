@@ -17,6 +17,14 @@ get_active_theme() {
   fi
 }
 
+cmd_fetch() {
+  if [ -f "$ZENITH_DIR/core/fetch.sh" ]; then
+    bash "$ZENITH_DIR/core/fetch.sh"
+  else
+    printf "❌ Fetch module not found at %s/core/fetch.sh\n" "$ZENITH_DIR"
+  fi
+}
+
 cmd_list() {
   local current
   current=$(get_active_theme)
@@ -50,7 +58,7 @@ cmd_set() {
     mkdir -p "$ZENITH_DIR"
     echo "$target" > "$ZENITH_THEME_FILE"
     printf "\033[1;32m✨ Zenith theme switched to: %s\033[0m\n" "$target"
-    printf "Restart your terminal or press Enter to see changes.\n"
+    printf "Press Enter or open a new terminal session to see changes.\n"
   else
     printf "\033[1;31m❌ Unknown theme '%s'. Run 'zenith list' to see available themes.\033[0m\n" "$target"
     return 1
@@ -64,8 +72,8 @@ cmd_preview() {
     source "$ZENITH_DIR/core/zenith.sh" 2>/dev/null || true
     zenith_load_colors
     printf "\033[1m[%s]\033[0m\n" "$t"
-    printf "  %b~/projects/app%b %b main%b\n" "$C_DIR" "$C_RESET" "$C_GIT" "$C_RESET"
-    printf "  %b➜%b %b❯%b ls\n\n" "$C_SUCCESS" "$C_RESET" "$C_ARROW" "$C_RESET"
+    printf "  %b╭─%b %b~/projects/app%b %b main%b %b[12:00:00]%b\n" "$C_FRAME" "$C_RESET" "$C_DIR" "$C_RESET" "$C_GIT" "$C_RESET" "$C_TIME" "$C_RESET"
+    printf "  %b╰─%b%b➜%b %b❯%b ls\n\n" "$C_FRAME" "$C_RESET" "$C_SUCCESS" "$C_RESET" "$C_ARROW" "$C_RESET"
   done
 }
 
@@ -79,6 +87,9 @@ cmd_info() {
 }
 
 case "$1" in
+  fetch)
+    cmd_fetch
+    ;;
   list)
     cmd_list
     ;;
@@ -93,6 +104,7 @@ case "$1" in
     ;;
   help|--help|-h|*)
     printf "\n\033[1;36m⚡ Zenith Shell CLI\033[0m\n"
+    printf "  zenith fetch           - Display full device & hardware specs\n"
     printf "  zenith list            - List all available themes\n"
     printf "  zenith set <theme>     - Switch the active theme\n"
     printf "  zenith preview         - Preview all themes visually\n"

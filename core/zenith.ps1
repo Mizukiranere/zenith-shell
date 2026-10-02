@@ -3,8 +3,16 @@
 # https://github.com/Mizukiranere/zenith-shell
 # ==============================================================================
 
+try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
+
 $script:ZenithDir = "$HOME\.zenith"
 $script:ZenithThemeFile = "$script:ZenithDir\current_theme"
+
+# Import Fetcher Module
+$script:CoreDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+if (-not $script:CoreDir) { $script:CoreDir = "C:\Users\Administrator\Documents\zenith-shell\core" }
+$fetchScript = Join-Path $script:CoreDir "fetch.ps1"
+if (Test-Path $fetchScript) { . $fetchScript }
 
 function Get-ZenithActiveTheme {
     if (Test-Path $script:ZenithThemeFile) {
@@ -21,50 +29,50 @@ function Get-ZenithColors {
     switch ($Theme.ToLower()) {
         "tokyonight" {
             return @{
-                Env = "$e[38;5;141m"; User = "$e[38;5;111m"; Dir = "$e[38;5;117m"
-                Git = "$e[38;5;215m"; GitDirty = "$e[38;5;203m"
+                Frame = "$e[38;5;60m"; Env = "$e[38;5;141m"; User = "$e[38;5;111m"; Dir = "$e[38;5;117m"
+                Git = "$e[38;5;215m"; GitDirty = "$e[38;5;203m"; Time = "$e[38;5;103m"
                 Success = "$e[38;5;120m"; Err = "$e[38;5;196m"; Arrow = "$e[38;5;141m"; Reset = "$e[0m"
             }
         }
         "catppuccin" {
             return @{
-                Env = "$e[38;5;183m"; User = "$e[38;5;217m"; Dir = "$e[38;5;153m"
-                Git = "$e[38;5;223m"; GitDirty = "$e[38;5;210m"
+                Frame = "$e[38;5;239m"; Env = "$e[38;5;183m"; User = "$e[38;5;217m"; Dir = "$e[38;5;153m"
+                Git = "$e[38;5;223m"; GitDirty = "$e[38;5;210m"; Time = "$e[38;5;246m"
                 Success = "$e[38;5;150m"; Err = "$e[38;5;203m"; Arrow = "$e[38;5;183m"; Reset = "$e[0m"
             }
         }
         "nord" {
             return @{
-                Env = "$e[38;5;110m"; User = "$e[38;5;109m"; Dir = "$e[38;5;152m"
-                Git = "$e[38;5;179m"; GitDirty = "$e[38;5;131m"
+                Frame = "$e[38;5;238m"; Env = "$e[38;5;110m"; User = "$e[38;5;109m"; Dir = "$e[38;5;152m"
+                Git = "$e[38;5;179m"; GitDirty = "$e[38;5;131m"; Time = "$e[38;5;243m"
                 Success = "$e[38;5;108m"; Err = "$e[38;5;131m"; Arrow = "$e[38;5;110m"; Reset = "$e[0m"
             }
         }
         "matrix" {
             return @{
-                Env = "$e[38;5;46m"; User = "$e[38;5;34m"; Dir = "$e[38;5;82m"
-                Git = "$e[38;5;118m"; GitDirty = "$e[38;5;196m"
+                Frame = "$e[38;5;22m"; Env = "$e[38;5;46m"; User = "$e[38;5;34m"; Dir = "$e[38;5;82m"
+                Git = "$e[38;5;118m"; GitDirty = "$e[38;5;196m"; Time = "$e[38;5;28m"
                 Success = "$e[38;5;46m"; Err = "$e[38;5;160m"; Arrow = "$e[38;5;46m"; Reset = "$e[0m"
             }
         }
         "dracula" {
             return @{
-                Env = "$e[38;5;141m"; User = "$e[38;5;212m"; Dir = "$e[38;5;117m"
-                Git = "$e[38;5;228m"; GitDirty = "$e[38;5;203m"
+                Frame = "$e[38;5;60m"; Env = "$e[38;5;141m"; User = "$e[38;5;212m"; Dir = "$e[38;5;117m"
+                Git = "$e[38;5;228m"; GitDirty = "$e[38;5;203m"; Time = "$e[38;5;103m"
                 Success = "$e[38;5;84m"; Err = "$e[38;5;196m"; Arrow = "$e[38;5;212m"; Reset = "$e[0m"
             }
         }
         "minimal" {
             return @{
-                Env = "$e[38;5;244m"; User = "$e[38;5;250m"; Dir = "$e[38;5;255m"
-                Git = "$e[38;5;248m"; GitDirty = "$e[38;5;203m"
+                Frame = "$e[38;5;238m"; Env = "$e[38;5;244m"; User = "$e[38;5;250m"; Dir = "$e[38;5;255m"
+                Git = "$e[38;5;248m"; GitDirty = "$e[38;5;203m"; Time = "$e[38;5;240m"
                 Success = "$e[38;5;255m"; Err = "$e[38;5;196m"; Arrow = "$e[38;5;250m"; Reset = "$e[0m"
             }
         }
         Default { # Cyberpunk
             return @{
-                Env = "$e[38;5;51m"; User = "$e[38;5;198m"; Dir = "$e[38;5;226m"
-                Git = "$e[38;5;201m"; GitDirty = "$e[38;5;196m"
+                Frame = "$e[38;5;239m"; Env = "$e[38;5;51m"; User = "$e[38;5;198m"; Dir = "$e[38;5;226m"
+                Git = "$e[38;5;201m"; GitDirty = "$e[38;5;196m"; Time = "$e[38;5;245m"
                 Success = "$e[38;5;48m"; Err = "$e[38;5;196m"; Arrow = "$e[38;5;51m"; Reset = "$e[0m"
             }
         }
@@ -73,6 +81,7 @@ function Get-ZenithColors {
 
 function Get-ZenithGitBranch {
     $c = Get-ZenithColors (Get-ZenithActiveTheme)
+    $gitIcon = "$([char]0x2387)"
     try {
         $b = (& git symbolic-ref --short HEAD 2>$null)
         if (-not $b) {
@@ -81,7 +90,7 @@ function Get-ZenithGitBranch {
         if ($b) {
             $status = (& git status --porcelain 2>$null)
             $dirty = if ($status) { "$($c.GitDirty)*" } else { "" }
-            return " $($c.Git) $b$dirty$($c.Reset)"
+            return " $($c.Git)$gitIcon $b$dirty$($c.Reset)"
         }
     } catch {}
     return ""
@@ -97,20 +106,25 @@ function Format-ZenithPath {
     return $p.Replace("\", "/")
 }
 
-# Override Global PowerShell Prompt
+# Override Global PowerShell Prompt (Cyberpunk / Modern HUD style)
 function global:prompt {
     $lastSuccess = $?
     $theme = Get-ZenithActiveTheme
     $c = Get-ZenithColors $theme
 
+    $boxTop = "$([char]0x256D)$([char]0x2500)"
+    $boxBottom = "$([char]0x2570)$([char]0x2500)"
+    $arrowSym = "$([char]0x276F)"
+
     $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
     $adminBadge = if ($isAdmin) { "$($c.Err)[ADMIN]$($c.Reset) " } else { "" }
 
+    $timeStr = "$($c.Time)[$(Get-Date -Format 'HH:mm:ss')]$($c.Reset)"
     $statusInd = if ($lastSuccess) { "$($c.Success)➜$($c.Reset)" } else { "$($c.Err)✘$($c.Reset)" }
     $dirStr = "$($c.Dir)$(Format-ZenithPath)$($c.Reset)"
     $gitStr = Get-ZenithGitBranch
 
-    "`n$adminBadge$dirStr$gitStr`n$statusInd $($c.Arrow)❯$($c.Reset) "
+    "`n$($c.Frame)$boxTop$($c.Reset) $adminBadge$dirStr$gitStr $timeStr`n$($c.Frame)$boxBottom$($c.Reset)$statusInd $($c.Arrow)$arrowSym$($c.Reset) "
 }
 
 # CLI Helper inside PowerShell: zenith <command>
@@ -125,6 +139,14 @@ function global:zenith {
     $themes = @("cyberpunk", "tokyonight", "catppuccin", "nord", "matrix", "dracula", "minimal")
 
     switch ($Command.ToLower()) {
+        "fetch" {
+            if (Get-Command Show-ZenithFetch -ErrorAction SilentlyContinue) {
+                Show-ZenithFetch
+            } else {
+                $f = "C:\Users\Administrator\Documents\zenith-shell\core\fetch.ps1"
+                if (Test-Path $f) { . $f; Show-ZenithFetch } else { Write-Host "Fetching specs..." }
+            }
+        }
         "list" {
             Write-Host "`n🎨 Available Zenith Themes:" -ForegroundColor Cyan
             $current = Get-ZenithActiveTheme
@@ -150,11 +172,16 @@ function global:zenith {
         }
         "preview" {
             Write-Host "`n🌟 Zenith Themes Preview:`n" -ForegroundColor Yellow
+            $boxTop = "$([char]0x256D)$([char]0x2500)"
+            $boxBottom = "$([char]0x2570)$([char]0x2500)"
+            $arrowSym = "$([char]0x276F)"
+            $gitIcon = "$([char]0x2387)"
+
             foreach ($t in $themes) {
                 $c = Get-ZenithColors $t
                 Write-Host "[$t]" -ForegroundColor White
-                Write-Host "  $($c.Dir)~/projects/app$($c.Reset) $($c.Git) main$($c.Reset)"
-                Write-Host "  $($c.Success)➜$($c.Reset) $($c.Arrow)❯$($c.Reset) ls`n"
+                Write-Host "  $($c.Frame)$boxTop$($c.Reset) $($c.Dir)~/projects/app$($c.Reset) $($c.Git)$gitIcon main$($c.Reset) $($c.Time)[12:00:00]$($c.Reset)"
+                Write-Host "  $($c.Frame)$boxBottom$($c.Reset)$($c.Success)➜$($c.Reset) $($c.Arrow)$arrowSym$($c.Reset) ls`n"
             }
         }
         "info" {
@@ -165,6 +192,7 @@ function global:zenith {
         }
         Default {
             Write-Host "`n⚡ Zenith Shell CLI" -ForegroundColor Cyan
+            Write-Host "  zenith fetch           - Display full device & hardware specs"
             Write-Host "  zenith list            - List all available themes"
             Write-Host "  zenith set <theme>     - Switch the active theme"
             Write-Host "  zenith preview         - Preview all themes visually"
