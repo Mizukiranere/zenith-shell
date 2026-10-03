@@ -4,6 +4,7 @@
 # ==============================================================================
 
 function global:Show-ZenithFetch {
+    try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
     $e = [char]27
     $theme = if (Get-Command Get-ZenithActiveTheme -ErrorAction SilentlyContinue) { Get-ZenithActiveTheme } else { "cyberpunk" }
 
@@ -63,7 +64,7 @@ function global:Show-ZenithFetch {
     Write-Host "  $b   / / / _ \ '_ \ | | __| '_ \     $r   $k[HOST]  :$r $v$model$r"
     Write-Host "  $b  / /_|  __/ | | || | |_| | | |    $r   $k[CPU]   :$r $v$cpuName $cpuCores$r"
     Write-Host "  $b /_____\___|_| |_||_|\__|_| |_|    $r   $k[RAM]   :$r $g[$ramBar]$r $v$usedRamGb GB / $totalRamGb GB ($ramPercent`%)$r"
-    Write-Host "  $p   ⚡ ZENITH SYSTEM SPECS ⚡      $r   $k[UPTIME]:$r $v$uptime$r"
+    Write-Host "  $p   $([char]0x26A1) ZENITH SYSTEM SPECS $([char]0x26A1)      $r   $k[UPTIME]:$r $v$uptime$r"
     Write-Host "  $b                                   $r   $k[SHELL] :$r $v$shell$r"
     Write-Host "  $b                                   $r   $k[THEME] :$r $y$theme$r"
     Write-Host "                                       $palette"

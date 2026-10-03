@@ -21,10 +21,10 @@ $RepoUrl = "https://github.com/Mizukiranere/zenith-shell.git"
 
 # Clone or copy
 if (Test-Path "$ZenithHome\.git") {
-    Write-Host "🔄 Updating existing Zenith Shell installation..." -ForegroundColor Yellow
+    Write-Host "$([char]::ConvertFromUtf32(0x1F504)) Updating existing Zenith Shell installation..." -ForegroundColor Yellow
     & git -C $ZenithHome pull --quiet
 } else {
-    Write-Host "📥 Installing Zenith Shell to $ZenithHome..." -ForegroundColor Yellow
+    Write-Host "$([char]::ConvertFromUtf32(0x1F4E5)) Installing Zenith Shell to $ZenithHome..." -ForegroundColor Yellow
     if (Test-Path $ZenithHome) { Remove-Item $ZenithHome -Recurse -Force -ErrorAction SilentlyContinue }
     & git clone --depth 1 $RepoUrl $ZenithHome --quiet
 }
@@ -42,7 +42,7 @@ $HookCommand = "`n# Zenith Shell Prompt Engine`nif (Test-Path `"$ZenithHome\core
 $ProfileContent = Get-Content $ProfilePath -Raw -ErrorAction SilentlyContinue
 if ($ProfileContent -notmatch "zenith\.ps1") {
     Add-Content -Path $ProfilePath -Value $HookCommand
-    Write-Host "🔗 Added Zenith hook to PowerShell Profile: $ProfilePath" -ForegroundColor Green
+    Write-Host "$([char]::ConvertFromUtf32(0x1F517)) Added Zenith hook to PowerShell Profile: $ProfilePath" -ForegroundColor Green
 }
 
 # Initialize default theme
@@ -55,14 +55,14 @@ if (Test-Path "$ZenithHome\core\zenith.ps1") {
     . "$ZenithHome\core\zenith.ps1"
 }
 
-Write-Host "`n✅ Zenith Shell successfully installed for PowerShell!" -ForegroundColor Green
+Write-Host "`n$([char]0x2705) Zenith Shell successfully installed for PowerShell!" -ForegroundColor Green
 
 # Display hardware specs immediately
 if (Get-Command Show-ZenithFetch -ErrorAction SilentlyContinue) {
     Show-ZenithFetch
 }
 
-Write-Host "👉 Commands:"
+Write-Host "$([char]::ConvertFromUtf32(0x1F449)) Commands:"
 Write-Host "   zenith fetch          (show full device & hardware specs)" -ForegroundColor Cyan
 Write-Host "   zenith list           (view available themes)" -ForegroundColor Cyan
 Write-Host "   zenith set tokyonight (change theme)" -ForegroundColor Cyan

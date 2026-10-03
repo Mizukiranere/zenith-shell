@@ -9,8 +9,8 @@ $script:ZenithDir = "$HOME\.zenith"
 $script:ZenithThemeFile = "$script:ZenithDir\current_theme"
 
 # Import Fetcher Module
-$script:CoreDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-if (-not $script:CoreDir) { $script:CoreDir = "C:\Users\Administrator\Documents\zenith-shell\core" }
+$script:CoreDir = $PSScriptRoot
+if (-not $script:CoreDir) { $script:CoreDir = Join-Path $script:ZenithDir "core" }
 $fetchScript = Join-Path $script:CoreDir "fetch.ps1"
 if (Test-Path $fetchScript) { . $fetchScript }
 
@@ -120,7 +120,7 @@ function global:prompt {
     $adminBadge = if ($isAdmin) { "$($c.Err)[ADMIN]$($c.Reset) " } else { "" }
 
     $timeStr = "$($c.Time)[$(Get-Date -Format 'HH:mm:ss')]$($c.Reset)"
-    $statusInd = if ($lastSuccess) { "$($c.Success)➜$($c.Reset)" } else { "$($c.Err)✘$($c.Reset)" }
+    $statusInd = if ($lastSuccess) { "$($c.Success)$([char]0x279C)$($c.Reset)" } else { "$($c.Err)$([char]0x2718)$($c.Reset)" }
     $dirStr = "$($c.Dir)$(Format-ZenithPath)$($c.Reset)"
     $gitStr = Get-ZenithGitBranch
 
@@ -143,35 +143,35 @@ function global:zenith {
             if (Get-Command Show-ZenithFetch -ErrorAction SilentlyContinue) {
                 Show-ZenithFetch
             } else {
-                $f = "C:\Users\Administrator\Documents\zenith-shell\core\fetch.ps1"
+                $f = Join-Path $script:CoreDir "fetch.ps1"
                 if (Test-Path $f) { . $f; Show-ZenithFetch } else { Write-Host "Fetching specs..." }
             }
         }
         "list" {
-            Write-Host "`n🎨 Available Zenith Themes:" -ForegroundColor Cyan
+            Write-Host "`n$([char]::ConvertFromUtf32(0x1F3A8)) Available Zenith Themes:" -ForegroundColor Cyan
             $current = Get-ZenithActiveTheme
             foreach ($t in $themes) {
                 $c = Get-ZenithColors $t
                 $activeMark = if ($t -eq $current) { " (active)" } else { "" }
-                Write-Host "  • $t$activeMark" -ForegroundColor $(if ($t -eq $current) { [ConsoleColor]::Green } else { [ConsoleColor]::Gray })
+                Write-Host "  $([char]0x2022) $t$activeMark" -ForegroundColor $(if ($t -eq $current) { [ConsoleColor]::Green } else { [ConsoleColor]::Gray })
             }
             Write-Host "`nUsage: zenith set <theme-name>`n"
         }
         "set" {
             if (-not $Argument) {
-                Write-Host "❌ Error: Please specify a theme name. Example: zenith set tokyonight" -ForegroundColor Red
+                Write-Host "$([char]0x274C) Error: Please specify a theme name. Example: zenith set tokyonight" -ForegroundColor Red
                 return
             }
             if ($themes -contains $Argument.ToLower()) {
                 if (-not (Test-Path $script:ZenithDir)) { New-Item -ItemType Directory -Force -Path $script:ZenithDir | Out-Null }
                 Set-Content -Path $script:ZenithThemeFile -Value $Argument.ToLower()
-                Write-Host "✨ Zenith theme switched to: $Argument" -ForegroundColor Green
+                Write-Host "$([char]0x2728) Zenith theme switched to: $Argument" -ForegroundColor Green
             } else {
-                Write-Host "❌ Unknown theme: $Argument. Run 'zenith list' to see all themes." -ForegroundColor Red
+                Write-Host "$([char]0x274C) Unknown theme: $Argument. Run 'zenith list' to see all themes." -ForegroundColor Red
             }
         }
         "preview" {
-            Write-Host "`n🌟 Zenith Themes Preview:`n" -ForegroundColor Yellow
+            Write-Host "`n$([char]::ConvertFromUtf32(0x1F31F)) Zenith Themes Preview:`n" -ForegroundColor Yellow
             $boxTop = "$([char]0x256D)$([char]0x2500)"
             $boxBottom = "$([char]0x2570)$([char]0x2500)"
             $arrowSym = "$([char]0x276F)"
@@ -181,17 +181,17 @@ function global:zenith {
                 $c = Get-ZenithColors $t
                 Write-Host "[$t]" -ForegroundColor White
                 Write-Host "  $($c.Frame)$boxTop$($c.Reset) $($c.Dir)~/projects/app$($c.Reset) $($c.Git)$gitIcon main$($c.Reset) $($c.Time)[12:00:00]$($c.Reset)"
-                Write-Host "  $($c.Frame)$boxBottom$($c.Reset)$($c.Success)➜$($c.Reset) $($c.Arrow)$arrowSym$($c.Reset) ls`n"
+                Write-Host "  $($c.Frame)$boxBottom$($c.Reset)$($c.Success)$([char]0x279C)$($c.Reset) $($c.Arrow)$arrowSym$($c.Reset) ls`n"
             }
         }
         "info" {
-            Write-Host "`n⚡ Zenith Shell Prompt Engine" -ForegroundColor Cyan
+            Write-Host "`n$([char]0x26A1) Zenith Shell Prompt Engine" -ForegroundColor Cyan
             Write-Host "  Active Theme : $(Get-ZenithActiveTheme)" -ForegroundColor White
             Write-Host "  Shell        : PowerShell $($PSVersionTable.PSVersion)" -ForegroundColor White
             Write-Host "  Config Path  : $script:ZenithThemeFile`n" -ForegroundColor White
         }
         Default {
-            Write-Host "`n⚡ Zenith Shell CLI" -ForegroundColor Cyan
+            Write-Host "`n$([char]0x26A1) Zenith Shell CLI" -ForegroundColor Cyan
             Write-Host "  zenith fetch           - Display full device & hardware specs"
             Write-Host "  zenith list            - List all available themes"
             Write-Host "  zenith set <theme>     - Switch the active theme"
